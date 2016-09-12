@@ -132,6 +132,16 @@ CREATE TABLE qux (
 ) DEFAULT CHARACTER SET utf8;
 ',
 
+  qux5 => '
+CREATE TABLE qux (
+  id         INT,
+  another_id INT NOT NULL AUTO_INCREMENT,
+  age        INT,
+  UNIQUE KEY (id),
+  PRIMARY KEY (another_id)
+) DEFAULT CHARACTER SET utf8;
+',
+
 );
 
 my %tests = (
@@ -521,6 +531,22 @@ ALTER TABLE qux ADD COLUMN id int(11) NOT NULL AUTO_INCREMENT UNIQUE KEY;
 ## +++ file: tmp.db2
 
 ALTER TABLE qux CHANGE COLUMN id id int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY;
+',
+  ],
+
+  'add a new column with auto increment, primary key and remove it from the original' =>
+  [
+    {},
+    $tables{qux4},
+    $tables{qux5},
+    '## mysqldiff <VERSION>
+##
+## Run on <DATE>
+##
+## --- file: tmp.db1
+## +++ file: tmp.db2
+
+ALTER TABLE qux ADD COLUMN id int(11) NOT NULL AUTO_INCREMENT UNIQUE KEY;
 ',
   ],
 
