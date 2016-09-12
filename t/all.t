@@ -111,13 +111,20 @@ CREATE TABLE qux (
 
   qux2 => '
 CREATE TABLE qux (
+  id  INT,
+  age INT
+) DEFAULT CHARACTER SET utf8;
+',
+
+  qux3 => '
+CREATE TABLE qux (
   id  INT NOT NULL AUTO_INCREMENT,
   age INT,
   PRIMARY KEY (id)
 ) DEFAULT CHARACTER SET utf8;
 ',
 
-  qux3 => '
+  qux4 => '
 CREATE TABLE qux (
   id  INT NOT NULL AUTO_INCREMENT,
   age INT,
@@ -469,23 +476,7 @@ ALTER TABLE baz ADD UNIQUE firstname (firstname,surname);
 ',
   ],
 
-  'add auto increment primary key' =>
-  [
-    {},
-    $tables{qux1},
-    $tables{qux2},
-    '## mysqldiff <VERSION>
-##
-## Run on <DATE>
-##
-## --- file: tmp.db1
-## +++ file: tmp.db2
-
-ALTER TABLE qux ADD COLUMN id int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY;
-',
-  ],
-
-  'add auto increment unique key' =>
+  'add new column with auto increment, primary key' =>
   [
     {},
     $tables{qux1},
@@ -497,9 +488,42 @@ ALTER TABLE qux ADD COLUMN id int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY;
 ## --- file: tmp.db1
 ## +++ file: tmp.db2
 
+ALTER TABLE qux ADD COLUMN id int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY;
+',
+  ],
+
+  'add new column with auto increment, unique key' =>
+  [
+    {},
+    $tables{qux1},
+    $tables{qux4},
+    '## mysqldiff <VERSION>
+##
+## Run on <DATE>
+##
+## --- file: tmp.db1
+## +++ file: tmp.db2
+
 ALTER TABLE qux ADD COLUMN id int(11) NOT NULL AUTO_INCREMENT UNIQUE KEY;
 ',
   ],
+
+  'add auto increment, unique key to an existing column' =>
+  [
+    {},
+    $tables{qux2},
+    $tables{qux3},
+    '## mysqldiff <VERSION>
+##
+## Run on <DATE>
+##
+## --- file: tmp.db1
+## +++ file: tmp.db2
+
+ALTER TABLE qux CHANGE COLUMN id id int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY;
+',
+  ],
+
 );
 
 my $BAIL = check_setup();
